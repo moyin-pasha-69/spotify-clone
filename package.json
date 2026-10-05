@@ -1,0 +1,36 @@
+{
+  "name": "spotify-clone",
+  "version": "1.0.0",
+  "description": "this is a clone of spotify that handles role of users",
+  "keywords": [
+    "spotify",
+    "backend",
+    "express",
+    "nodejs",
+    "mongodb"
+  ],
+  "homepage": "https://github.com/moyin-pasha-69/spotify-clone#readme",
+  "bugs": {
+    "url": "https://github.com/moyin-pasha-69/spotify-clone/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moyin-pasha-69/spotify-clone.git"
+  },
+  "author": "Moyin Pasha",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "mt": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.4",
+    "nodemon": "^1.14.10"
+  }
+}
