@@ -8,11 +8,10 @@ const musicSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    unique: true,
   },
-  role: {
+  artist: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: "users",
     required: true,
   },
 });
