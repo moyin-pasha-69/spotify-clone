@@ -3,7 +3,6 @@ import ImageKit from "@imagekit/nodejs";
 const ImageKitFile = new ImageKit({
   privateKey: process.env.IMG_KIT_SECRET,
 });
-
 async function uploadFile(file) {
   try {
     const response = await ImageKitFile.files.upload({

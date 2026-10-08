@@ -24,4 +24,24 @@ async function addMusic(req, res) {
   });
 }
 
-export { addMusic };
+async function allMusic(req, res) {
+  try {
+    // ! this populate function give us detail of artist instead  of id
+    // ? automatically replaces a referenced ObjectId field in a document with the actual document data from another collection
+    const music = await musicModel
+      .find()
+      .populate("artist", "username email -_id");
+
+    res.status(200).json({
+      message: "music fetched successfully!",
+      musics: music,
+    });
+  } catch (error) {
+    console.log("error occur during showing all music : ", error);
+    return res.status(204).json({
+      message: "Empty musics",
+    });
+  }
+}
+
+export { addMusic, allMusic };

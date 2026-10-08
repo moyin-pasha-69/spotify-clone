@@ -20,14 +20,43 @@ async function verifyArtist(req, res, next) {
       });
     }
 
+    // ! we sending a   new req.user that holds decoded which helps us  in controllers
     req.user = decoded;
+
+    // ! this  use to go next otherwise it not go forward in path
     next();
   } catch (error) {
-    console.log(error);
+    console.log("error occur during verifyingUser : ", error);
     return res.status(401).json({
       message: "Unauthorized",
     });
   }
 }
 
-export default verifyArtist;
+async function verifyUser(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== "user" && decoded.role !== "artist") {
+      return res.status(403).json({
+        message: "you don't have access",
+      });
+    }
+    next();
+  } catch (error) {
+    console.log("error occur during verifyingUser : ", error);
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+}
+
+export { verifyArtist, verifyUser };
