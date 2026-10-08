@@ -20,4 +20,23 @@ async function createAlbum(req, res) {
   });
 }
 
-export default createAlbum;
+async function getAllAlbums(req, res) {
+  try {
+    const albums = await albumModel
+      .find()
+      .select("title artist")
+      .populate("artist", "username email");
+
+    res.status(200).json({
+      message: "Album fetched successfully!",
+      albums: albums,
+    });
+  } catch (error) {
+    console.log("error occur during getting albums : ", error);
+    return res.status(404).json({
+      message: "Empty albums",
+    });
+  }
+}
+
+export { createAlbum, getAllAlbums };

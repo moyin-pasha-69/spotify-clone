@@ -38,7 +38,7 @@ async function allMusic(req, res) {
     });
   } catch (error) {
     console.log("error occur during showing all music : ", error);
-    return res.status(204).json({
+    return res.status(404).json({
       message: "Empty musics",
     });
   }
