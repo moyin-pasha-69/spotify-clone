@@ -25,7 +25,7 @@ async function getAllAlbums(req, res) {
     const albums = await albumModel
       .find()
       .select("title artist")
-      .populate("artist", "username email");
+      .populate("artist", "username email -_id");
 
     res.status(200).json({
       message: "Album fetched successfully!",
@@ -39,4 +39,24 @@ async function getAllAlbums(req, res) {
   }
 }
 
-export { createAlbum, getAllAlbums };
+async function getAlbumById(req, res) {
+  try {
+    const id = req.params.id;
+    const album = await albumModel
+      .findById(id)
+      .populate("artist", "username email -_id")
+      .populate("musics");
+
+    return res.status(200).json({
+      message: "album fetched successfully!",
+      albums: album,
+    });
+  } catch (error) {
+    console.log("error occur  during getting album by id : ", error);
+    return res.status(404).json({
+      message: "something went wrong",
+    });
+  }
+}
+
+export { createAlbum, getAllAlbums, getAlbumById };

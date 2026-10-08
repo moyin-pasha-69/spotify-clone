@@ -20,5 +20,10 @@ router.post("/album", authMiddleware.verifyArtist, albumController.createAlbum);
 
 router.get("/", authMiddleware.verifyUser, musicController.allMusic);
 router.get("/albums", authMiddleware.verifyUser, albumController.getAllAlbums);
+router.get(
+  "/albums/:id",
+  authMiddleware.verifyUser,
+  albumController.getAlbumById,
+);
 
 export default router;
