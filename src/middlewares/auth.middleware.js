@@ -43,13 +43,12 @@ async function verifyUser(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (decoded.role !== "user" && decoded.role !== "artist") {
-      return res.status(403).json({
-        message: "you don't have access",
-      });
-    }
+    jwt.verify(token, process.env.JWT_SECRET);
+    // if (decoded.role !== "user" && decoded.role !== "artist") {
+    //   return res.status(403).json({
+    //     message: "you don't have access",
+    //   });
+    // }
     next();
   } catch (error) {
     console.log("error occur during verifyingUser : ", error);

@@ -21,7 +21,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "mt": "nodemon server.js",
+    "dev": "nodemon server.js",
     "start": "node server.js"
   },
   "dependencies": {

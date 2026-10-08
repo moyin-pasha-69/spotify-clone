@@ -2,23 +2,20 @@ import express from "express";
 import * as musicController from "../controllers/music.controller.js";
 import * as albumController from "../controllers/album.controller.js";
 import * as authMiddleware from "../middlewares/auth.middleware.js";
-import multer from "multer";
-
-const uploadMusic = multer({
-  storage: multer.memoryStorage(),
-});
+import fileMiddleware from "../middlewares/file.middleware.js";
 
 const router = express.Router();
 
+router.get("/", authMiddleware.verifyUser, musicController.allMusic);
+router.get("/:id", authMiddleware.verifyUser, musicController.getMusicById);
 router.post(
-  "/create",
+  "/",
   authMiddleware.verifyArtist,
-  uploadMusic.single("uri"),
+  fileMiddleware.single("uri"),
   musicController.addMusic,
 );
 router.post("/album", authMiddleware.verifyArtist, albumController.createAlbum);
 
-router.get("/", authMiddleware.verifyUser, musicController.allMusic);
 router.get("/albums", authMiddleware.verifyUser, albumController.getAllAlbums);
 router.get(
   "/albums/:id",
