@@ -45,7 +45,7 @@ async function getAlbumById(req, res) {
     const album = await albumModel
       .findById(id)
       .populate("artist", "username email -_id")
-      .populate("musics");
+      .populate("musics", "-_id");
 
     return res.status(200).json({
       message: "album fetched successfully!",

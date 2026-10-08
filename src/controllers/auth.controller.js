@@ -83,4 +83,10 @@ async function loginUsers(req, res) {
     console.error("error occur during login user ", error);
   }
 }
-export { registerUsers, loginUsers };
+async function logOutUser(req, res) {
+  res.clearCookie("token");
+  res.status(200).json({
+    message: "User Logout  successfully!",
+  });
+}
+export { registerUsers, loginUsers, logOutUser };
