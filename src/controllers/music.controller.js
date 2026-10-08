@@ -50,12 +50,6 @@ async function getMusicById(req, res) {
     const music = await musicModel
       .findById(id)
       .populate("artist", "username email -_id");
-    console.log(music);
-    if (!music) {
-      return res.status(404).json({
-        message: "Not found",
-      });
-    }
     res.status(200).json({
       message: "music fetched successfully!",
       music: music,
@@ -68,4 +62,19 @@ async function getMusicById(req, res) {
   }
 }
 
-export { addMusic, allMusic, getMusicById };
+async function deleteMusic(req, res) {
+  try {
+    const id = req.params.id;
+    await musicModel.findByIdAndDelete(id);
+    res.status(200).json({
+      message: "Music deleted successfully!",
+    });
+  } catch (error) {
+    console.log("error occur during deleting an music :  ", error);
+    return res.status(404).json({
+      message: "music not found",
+    });
+  }
+}
+
+export { addMusic, allMusic, getMusicById, deleteMusic };

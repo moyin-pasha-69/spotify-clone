@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import musicModel from "../models/music.models.js";
 async function verifyArtist(req, res, next) {
   // ! first check the user has  token or not in cookies or else is he logged or not
   const token = req.cookies.token;
@@ -58,4 +58,17 @@ async function verifyUser(req, res, next) {
   }
 }
 
-export { verifyArtist, verifyUser };
+async function verifyItsArtist(req, res, next) {
+  const check = await musicModel.find({
+    _id: req.params.id,
+    artist: req.user.id,
+  });
+  if (check.length === 0) {
+    return res.status(403).json({
+      message: "Unauthorized or music not found",
+    });
+  }
+  next();
+}
+
+export { verifyArtist, verifyUser, verifyItsArtist };

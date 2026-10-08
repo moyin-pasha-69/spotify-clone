@@ -14,6 +14,12 @@ router.post(
   fileMiddleware.single("uri"),
   musicController.addMusic,
 );
+router.delete(
+  "/:id",
+  authMiddleware.verifyArtist,
+  authMiddleware.verifyItsArtist,
+  musicController.deleteMusic,
+);
 router.post("/album", authMiddleware.verifyArtist, albumController.createAlbum);
 
 router.get("/albums", authMiddleware.verifyUser, albumController.getAllAlbums);
