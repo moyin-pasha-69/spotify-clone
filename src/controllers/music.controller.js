@@ -77,4 +77,67 @@ async function deleteMusic(req, res) {
   }
 }
 
-export { addMusic, allMusic, getMusicById, deleteMusic };
+async function updateMusic(req, res) {
+  try {
+    const { title } = req.body;
+    const file = req.file;
+    const id = req.params.id;
+
+    if (!file) {
+      const music = await musicModel.findOneAndUpdate(
+        { _id: id },
+        { title: title },
+      );
+      return res.status(201).json({
+        message: "Music updated Successfully!",
+        music: {
+          ID: music._id,
+          Title: title,
+          Uri: music.url,
+          artist: music.artist,
+        },
+      });
+    } else if (!title) {
+      const result = await uploadFile(file.buffer.toString("base64"));
+      const music = await musicModel.findOneAndUpdate(
+        { _id: id },
+        {
+          uri: result.url,
+        },
+      );
+      return res.status(201).json({
+        message: "Music updated Successfully!",
+        music: {
+          ID: music._id,
+          Title: title,
+          Uri: result.url,
+          artist: music.artist,
+        },
+      });
+    }
+    const result = await uploadFile(file.buffer.toString("base64"));
+    const music = await musicModel.findOneAndUpdate(
+      { _id: id },
+      {
+        uri: result.url,
+        title: title,
+      },
+    );
+    return res.status(201).json({
+      message: "Music updated Successfully!",
+      music: {
+        ID: music._id,
+        Title: title,
+        Uri: result.url,
+        artist: music.artist,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      message: "enter at least one field",
+    });
+  }
+}
+
+export { addMusic, allMusic, getMusicById, deleteMusic, updateMusic };

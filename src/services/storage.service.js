@@ -16,5 +16,10 @@ async function uploadFile(file) {
     console.error("Error occur during uploading file to imagekit : ", error);
   }
 }
+async function deleteFile(req, res) {
+  // const delete = await ImageKit.files.delete({
+  //   file:
+  // })
+}
 
 export default uploadFile;
