@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import musicModel from "../models/music.models.js";
+import AppError from "../utils/AppError.js";
 async function verifyArtist(req, res, next) {
   // ! first check the user has  token or not in cookies or else is he logged or not
   const token = req.cookies.token;
@@ -65,11 +66,11 @@ async function verifyItsArtist(req, res, next) {
       artist: req.user.id,
     });
     if (!check) {
-      return res.status(403).json({
-        message: "music not found or this is not your music",
-      });
+      return next(
+        new AppError("music not found or this is not your music", 404),
+      );
     }
-    next();
+    return next();
   } catch (error) {
     console.log("error occur during verifyingItsArtist: ", error);
     return res.status(500).json({

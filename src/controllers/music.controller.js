@@ -1,5 +1,6 @@
 import musicModel from "../models/music.models.js";
 import uploadFile from "../services/storage.service.js";
+import AppError from "../utils/AppError.js";
 import * as basicOperation from "../utils/basicOperation.utils.js";
 
 async function addMusic(req, res) {
@@ -16,10 +17,7 @@ async function addMusic(req, res) {
     try {
       result = await uploadFile(file.buffer.toString("base64"));
     } catch (error) {
-      console.log("error occur during uploading file to  imageKit : ", error);
-      return res.status(500).json({
-        message: "please try again",
-      });
+      return next(error);
     }
     const music = await musicModel.create({
       uri: result.url,
@@ -27,7 +25,7 @@ async function addMusic(req, res) {
       artist: req.user.id,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Music created Successfully!",
       music: {
         id: music._id,
@@ -37,10 +35,7 @@ async function addMusic(req, res) {
       },
     });
   } catch (error) {
-    console.log("error occur during : ", error);
-    return res.status(500).json({
-      message: "something went wrong from our side, try again",
-    });
+    return next(error);
   }
 }
 
@@ -51,53 +46,51 @@ async function allMusic(req, res) {
     const music = await musicModel
       .find()
       .populate("artist", "username email -_id");
-    res.status(200).json({
+    if (!music) {
+      return next(new AppError("music not found", 404));
+    }
+    return res.status(200).json({
       message: "music fetched successfully!",
       musics: music,
     });
   } catch (error) {
-    console.log("error occur during showing all music : ", error);
-    return res.status(500).json({
-      message: "something went wrong!",
-    });
+    return next(error);
   }
 }
 
-async function getMusicById(req, res) {
+async function getMusicById(req, res, next) {
   try {
     const id = req.params.id;
     const music = await musicModel
       .findById(id)
       .populate("artist", "username email -_id");
     if (!music) {
-      return res.status(404).json({
-        message: "Empty music",
-      });
+      return next(new AppError("music not found", 404));
     }
-    res.status(200).json({
+    return res.status(200).json({
       message: "music fetched successfully!",
       music: music,
     });
   } catch (error) {
-    console.log("error occur during getting music by id : ", error);
-    res.status(500).json({
-      message: "something went wrong!",
-    });
+    return next(error);
   }
 }
 
 async function deleteMusic(req, res) {
   try {
     const id = req.params.id;
-    await musicModel.findByIdAndDelete(id);
-    res.status(200).json({
+    const music = await musicModel.findByIdAndDelete(id, {
+      new: true,
+      runValidators: true,
+    });
+    if (!music) {
+      return next(new AppError("music not found", 404));
+    }
+    return res.status(200).json({
       message: "Music deleted successfully!",
     });
   } catch (error) {
-    console.log("error occur during deleting an music :  ", error);
-    return res.status(500).json({
-      message: "something went wrong from our side, try again",
-    });
+    return next(error);
   }
 }
 
@@ -125,27 +118,21 @@ async function updateMusic(req, res) {
         message: "At least give one field",
       });
     }
-    try {
-      const ogMusic = await musicModel
-        .findByIdAndUpdate(id, updateDetails, {
-          new: true,
-          runValidators: true,
-        })
-        .populate("artist", "username email -_id");
-      return res.status(200).json({
-        message: "updated successfully!",
-        music: ogMusic,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "something went wrong from our side, try again",
-      });
+    const ogMusic = await musicModel
+      .findByIdAndUpdate(id, updateDetails, {
+        new: true,
+        runValidators: true,
+      })
+      .populate("artist", "username email -_id");
+    if (!ogMusic) {
+      return next(new AppError("music not found", 404));
     }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "unexpected error",
+    return res.status(200).json({
+      message: "updated successfully!",
+      music: ogMusic,
     });
+  } catch (error) {
+    return next(error);
   }
 }
 
