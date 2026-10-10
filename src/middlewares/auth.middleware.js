@@ -59,16 +59,23 @@ async function verifyUser(req, res, next) {
 }
 
 async function verifyItsArtist(req, res, next) {
-  const check = await musicModel.find({
-    _id: req.params.id,
-    artist: req.user.id,
-  });
-  if (check.length === 0) {
-    return res.status(403).json({
-      message: "Unauthorized or music not found",
+  try {
+    const check = await musicModel.findOne({
+      _id: req.params.id,
+      artist: req.user.id,
+    });
+    if (!check) {
+      return res.status(403).json({
+        message: "music not found or this is not your music",
+      });
+    }
+    next();
+  } catch (error) {
+    console.log("error occur during verifyingItsArtist: ", error);
+    return res.status(500).json({
+      message: "something went wrong",
     });
   }
-  next();
 }
 
 export { verifyArtist, verifyUser, verifyItsArtist };

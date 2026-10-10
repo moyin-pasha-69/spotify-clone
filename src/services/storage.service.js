@@ -14,6 +14,7 @@ async function uploadFile(file) {
     return response;
   } catch (error) {
     console.error("Error occur during uploading file to imagekit : ", error);
+    return response;
   }
 }
 async function deleteFile(req, res) {
