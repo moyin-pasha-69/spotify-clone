@@ -3,7 +3,7 @@ import uploadFile from "../services/storage.service.js";
 import AppError from "../utils/AppError.js";
 import * as basicOperation from "../utils/basicOperation.utils.js";
 
-async function addMusic(req, res) {
+async function addMusic(req, res, next) {
   const file = req.file;
   const { title } = req.body;
 
@@ -39,16 +39,13 @@ async function addMusic(req, res) {
   }
 }
 
-async function allMusic(req, res) {
+async function allMusic(req, res, next) {
   try {
     // ! this populate function give us detail of artist instead  of id
     // ? automatically replaces a referenced ObjectId field in a document with the actual document data from another collection
     const music = await musicModel
       .find()
       .populate("artist", "username email -_id");
-    if (!music) {
-      return next(new AppError("music not found", 404));
-    }
     return res.status(200).json({
       message: "music fetched successfully!",
       musics: music,
@@ -76,16 +73,10 @@ async function getMusicById(req, res, next) {
   }
 }
 
-async function deleteMusic(req, res) {
+async function deleteMusic(req, res, next) {
   try {
     const id = req.params.id;
-    const music = await musicModel.findByIdAndDelete(id, {
-      new: true,
-      runValidators: true,
-    });
-    if (!music) {
-      return next(new AppError("music not found", 404));
-    }
+    await musicModel.findByIdAndDelete(id);
     return res.status(200).json({
       message: "Music deleted successfully!",
     });
@@ -94,13 +85,13 @@ async function deleteMusic(req, res) {
   }
 }
 
-async function updateMusic(req, res) {
+async function updateMusic(req, res, next) {
   try {
     const { title } = req.body;
     const file = req.file;
     const id = req.params.id;
     const updateDetails = {};
-    if (title) {
+    if (!basicOperation.isStringEmpty(title)) {
       updateDetails.title = title;
     }
     if (file) {
@@ -124,9 +115,6 @@ async function updateMusic(req, res) {
         runValidators: true,
       })
       .populate("artist", "username email -_id");
-    if (!ogMusic) {
-      return next(new AppError("music not found", 404));
-    }
     return res.status(200).json({
       message: "updated successfully!",
       music: ogMusic,
