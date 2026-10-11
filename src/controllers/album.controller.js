@@ -1,23 +1,28 @@
 import albumModel from "../models/album.model.js";
 import jwt from "jsonwebtoken";
+import AppError from "../utils/AppError.js";
 
-async function createAlbum(req, res) {
+async function createAlbum(req, res, next) {
   const { title, musicIds } = req.body;
-  const album = await albumModel.create({
-    title,
-    musics: musicIds,
-    artist: req.user.id,
-  });
+  try {
+    const album = await albumModel.create({
+      title,
+      musics: musicIds,
+      artist: req.user.id,
+    });
 
-  res.status(201).json({
-    message: "Album create successfully!",
-    album: {
-      id: album._id,
-      title: album.title,
-      music_list: album.musics,
-      artist: album.artist,
-    },
-  });
+    res.status(201).json({
+      message: "Album create successfully!",
+      album: {
+        id: album._id,
+        title: album.title,
+        music_list: album.musics,
+        artist: album.artist,
+      },
+    });
+  } catch (error) {
+    return next(new AppError("", 500));
+  }
 }
 
 async function getAllAlbums(req, res) {

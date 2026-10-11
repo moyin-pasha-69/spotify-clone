@@ -1,29 +1,32 @@
 import { userModel } from "../models/users.models.js";
 import jsonwebtoken from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import AppError from "../utils/AppError.js";
 
-async function registerUsers(req, res) {
+async function registerUsers(req, res, next) {
   try {
-    const { username, email, password, role = "user" } = req.body;
+    const { username, email, password, role } = req.body;
 
     const isUserAlreadyExist = await userModel.findOne({
       $or: [{ username }, { email }],
     });
-
+    console.log(isUserAlreadyExist);
     if (isUserAlreadyExist) {
-      return res.status(409).json({
-        message: "user already exist",
-      });
+      return next(new AppError("User already exist", 409));
     }
 
     const hash = await bcrypt.hash(password, 10);
-
-    const user = await userModel.create({
-      username,
-      email,
-      password: hash,
-      role,
-    });
+    let user;
+    try {
+      user = await userModel.create({
+        username: username.trim(),
+        email,
+        password: hash,
+        role,
+      });
+    } catch (error) {
+      return next(new AppError(error.message, 400));
+    }
 
     const token = jsonwebtoken.sign(
       {
@@ -35,12 +38,13 @@ async function registerUsers(req, res) {
 
     res.cookie("token", token);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "user register successfully!",
       user,
     });
   } catch (error) {
-    console.log("error occur during creating user", error);
+    console.log("error occur during creating user : ", error.message);
+    return next(new AppError("Internal server error", 500));
   }
 }
 async function loginUsers(req, res) {

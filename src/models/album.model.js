@@ -4,6 +4,9 @@ const albumSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    trim: true,
+    minLength: [3, "enter title at least 4 characters"],
+    maxLength: [15, "enter title under 15 characters"],
   },
   musics: [
     {
